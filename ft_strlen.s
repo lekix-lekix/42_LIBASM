@@ -1,5 +1,6 @@
 section     .text
     global      ft_strlen
+    ; global      _start
 
 ft_strlen:
     push    rbp                     ; pushing RBP (base pointer) to the stack. AKA saving its current state
