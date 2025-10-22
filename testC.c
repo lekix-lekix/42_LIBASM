@@ -22,12 +22,16 @@ int main () {
     // printf("%s\n", s3);
     // printf("%s\n", s1);
     int res;
-    res = write(-1, "coucou", 6);
+    res = ft_write(1, "coucou", 6);
     printf("%d\n", res);
     perror("write");
 
-    write(1, NULL, 6);
+    res = ft_write(-1, "coucou", 6);
+    printf("%d\n", res);
     perror("write");
+
+    // write(1, NULL, 6);
+    // perror("write");
 
     res = ft_write(-1, "coucou", 6);
     printf("%d\n", res);
