@@ -13,13 +13,13 @@ ft_strdup:
     mov     [rbp - 8], rdi      ; saving the original string ptr passed as arg
     inc     rax                 ; need on more byte for the \0
     mov     rdi, rax            ; moving the result of ft_strlen as arg for malloc
-    call    malloc wrt ..plt    ; calling malloc to allocate n bytes 
+    call    malloc wrt ..plt    ; calling malloc to allocate n bytes (wrt plt : to tell the compiler to look into external library)
     cmp     rax, 0              ; checking if the result of malloc is NULL
     je      .end                ; if so, returning it
     mov     rdi, rax            ; moving malloc return ptr as dest for ft_strcpy
     mov     rsi, [rbp - 8]      ; moving original str as src for ft_strcpy
-    push    rax                 ; saving rax, as some part of it will be erased by ft_strcpy
-    call    ft_strcpy
+    push    rax                 ; saving rax, as some of it will be erased by ft_strcpy
+    call    ft_strcpy           ; copying src into new allocated string
 
 .end:
     pop     rax                 ; restoring rax 
