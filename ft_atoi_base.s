@@ -35,13 +35,69 @@ check_base:
     call    check_invalid_char       ; checking invalid char (+, -, whitespaces)
     cmp     rax, -1
     je      .exit
-    ; call    check_dup_char           ; checking duplicates characters
-    ; cmp     rax, 0
-    ; je      .exit
+    call    check_dup_char           ; checking duplicates characters
+    cmp     rax, -1
+    je      .exit
+    call    convert                  ; start conversion
     ret
 
 .exit:
     ret
+
+;;;;;;;;;;;;;;;
+
+convert:
+    mov     rcx, -1                 ; init index
+    mov     rdx, 0                  ; neg or not ?
+    mov     rdi, [rel str]          ; moving address of string
+    mov     r8, 0                   ; init final nb
+    call    .check_sign
+    call    .convert_loop
+
+.check_sign:
+    mov     al, [rdi]               ; moving first char to cmp
+    cmp     al, '-'
+    je      .set_neg
+    ret
+
+.set_neg:
+    inc     rcx
+    mov     rdx, 1
+    ret
+
+.find_index:
+    inc     r9
+    cmp     byte [rdi + r9], 0
+    je      .exit_error
+    cmp     al, [rdi + r9]
+    je      .exit_idx_loop
+    jmp     .find_index
+
+.convert_loop:
+    inc     rcx                     ; inc index
+    mov     al, [rdi + rcx]         ; getting current char
+    cmp     al, 0                   ; checking null byte    
+    je      .exit
+    mov     r9, -1                  ; init index for find index
+    je      .exit             
+    cmp     r9, -1                  ; error check, -1 == current char not in base
+    call    .find_index
+    mov     rax, r8                 ; moving final nb to rax
+    mov     r10, [rel base_len]     ; moving base len int to r10
+    mul     r10                     ; multiplying rax (= final nb rn) by base len             
+    mov     r8, rax                 ; returning final number to r8
+    add     r8, r9                  ; adding index value to number
+    jmp     .convert_loop
+
+.exit:
+    ret
+
+.exit_error:
+    mov     rax, -1
+
+.exit_idx_loop:
+    mov     rax, r9
+
 
 ;;;;;;;;;;;;;;;
 
@@ -63,12 +119,12 @@ check_len:
 
 check_invalid_char:
     mov     rcx, -1                  ; initializing index
+    mov     rdx, [rel base]          ; moving address of base in rdx
     call    .loop
     ret
 
 .loop:
     inc     rcx                      ; incrementing index
-    mov     rdx, [rel base]          ; moving address of base in rdx
     mov     al, [rdx + rcx]          ; dereferencing string addr and put it inside al (rax low)
     cmp     al, 0                    ; checking end of string
     je      .exit_loop               ; exiting loop
@@ -107,36 +163,34 @@ check_invalid_char:
 ;;;;;;;;;;;;;;;
 
 check_dup_char:
-    mov     rcx, -1                  ; initializing index
+    mov     rcx, -1                  ; initializing main index
+    mov     rdx, [rel base]          ; loading address of base
     call    .outer_loop
+    ret
 
 .outer_loop:
     inc     rcx                      ; incrementing index (i)
-    mov     rdx, [rel base]          ; loading address of base
-    cmp     byte [rdx + rcx], 0
-    ; cmp     byte [rel base + rcx], 0 ; checking for null byte
+    cmp     byte [rdx + rcx], 0      ; checking for null byte
     je      .exit_loop               ; end of string = test passed
-    mov     dil, [rdx + rcx]    ; loading char to dup check
-    mov     rbx, -1                  ; init index for inner loop
-    call    .inner_loop              ; checking rest of str for duplicate
-    call    .outer_loop              ; going through each char to check dup
+    mov     al, [rdx + rcx]          ; loading char to dup check
+    mov     rbx, rcx                 ; init index at +1 character for inner loop
+    call    .inner_loop              ; CALL here (so the inner loop returns), checking rest of str for duplicate
+    cmp     rax, -1                  ; -1 = problem
+    je      .error_exit              ; problem = base invalid
+    jmp     .outer_loop              ; looping
 
 .inner_loop:
     inc     rbx                      ; incrementing index (j)
-    lea     rdx, [rel base]
-    cmp     byte [rdx + rbx], 0     ; checking for null byte
+    cmp     byte [rdx + rbx], 0      ; checking for null byte
     je      .exit_loop               ; end of string = test passed
-    cmp     byte [rdx + rbx], dil   ; comparing curr char with the one in rdi 
-    je      .error_exit               ; equal -> base invalid
-    call    .inner_loop              ; looping through the rest of string   
+    cmp     byte [rdx + rbx], al     ; comparing curr char with the one in al previously set in outer_loop
+    je      .error_exit              ; equal -> base invalid
+    jmp     .inner_loop              ; looping through the rest of string   
 
 .exit_loop:
-    ret
-
-.error_exit:
     mov     rax, 0
     ret
 
-; error_exit:
-;     mov     rax, 0
-;     ret
+.error_exit:
+    mov     rax, -1
+    ret
