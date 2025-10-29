@@ -33,6 +33,7 @@ int main (int argc, char **argv) {
     // printf("%d\n", res);
     // perror("write");
 
+    (void) argc;
     printf("%d\n", ft_strlen("cocou"));
 
 
@@ -66,7 +67,7 @@ int main (int argc, char **argv) {
     // printf("%s\n", str);
     // free(str);
     // char base[] = "01";
-    int nb = ft_atoi_base("15", argv[1]);
+    int nb = ft_atoi_base(argv[1], argv[2]);
     printf("%d\n", nb);
     // int fd = open("./testC.c", O_RDONLY);
     // read(fd, s1, -1);

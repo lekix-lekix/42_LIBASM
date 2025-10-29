@@ -17,7 +17,6 @@ ft_atoi_base:
     call    check_base
     cmp     rax, -1
     je      .exit_error
-    mov     rax, 1
     pop     rbp
     ret
 
@@ -47,57 +46,88 @@ check_base:
 ;;;;;;;;;;;;;;;
 
 convert:
-    mov     rcx, -1                 ; init index
-    mov     rdx, 0                  ; neg or not ?
-    mov     rdi, [rel str]          ; moving address of string
-    mov     r8, 0                   ; init final nb
+    push    rbp                     ; setting new stack func frame
+    mov     rbp, rsp                ; moving rsp to rbp
+    sub     rsp, 16                 ; declaring 2 local var (neg & final nb)
+    mov     DWORD [rbp - 8], 0      ; negative nb flag on the stack (DWORD == int)
+    mov     DWORD [rbp - 4], 0      ; init final nb on the stack 
+    mov     rsi, [rel str]          ; moving address of string to convert 
     call    .check_sign
-    call    .convert_loop
+    mov     sil, [rsi]
+    mov     rdi, [rel str]         ; loading base as 2nd arg of convert loop
+    mov     rcx, -1
+    mov     rsi, [rel base]
+    call    .convert_loop   
+    mov     rax, [rbp - 4]          ; moving final nb to rax (return convention)
+    add     rsp, 8
+    mov     rsp, rbp
+    pop     rbp
+    ret
 
 .check_sign:
     mov     al, [rdi]               ; moving first char to cmp
-    cmp     al, '-'
-    je      .set_neg
+    cmp     al, '-'                 ; checking minus sign
+    je      .set_neg                ; yes -> set neg flag
+    cmp     al, '+'                 ; checking plus sign
+    je      .inc_rcx                ; yes -> inc rcx
     ret
 
 .set_neg:
+    mov     byte [rbp - 8], 1
+    jmp     .inc_rcx
+
+.inc_rcx:
     inc     rcx
-    mov     rdx, 1
     ret
 
-.find_index:
-    inc     r9
-    cmp     byte [rdi + r9], 0
-    je      .exit_error
-    cmp     al, [rdi + r9]
-    je      .exit_idx_loop
-    jmp     .find_index
+.find_index:        ; arg1 : haystack, char 2 : needle (char)
+    push    rcx                     ; saving rcx
+    mov     rcx, -1                 ; init index
+    mov     al, dil                 ; loading needle into al
+    call    .find_index_loop        ; calling loop
+    pop     rcx
+    ret
 
-.convert_loop:
+.find_index_loop:
+    inc     rcx                     
+    cmp     byte [rsi + rcx], 0     ; checking null byte
+    je      .exit_idx_error         ; yes -> not found 
+    cmp     al, [rsi + rcx]         ; comparing needle with curr char of base
+    je      .found_index_exit       ; yes -> returning index
+    jmp     .find_index_loop        ; not -> looping
+
+.found_index_exit:
+    mov     rax, rcx
+    ret
+
+.exit_idx_error:
+    mov     rax, -1
+    ret
+
+.convert_loop:     ; arg1 : str to convert, arg2 : base
     inc     rcx                     ; inc index
-    mov     al, [rdi + rcx]         ; getting current char
-    cmp     al, 0                   ; checking null byte    
+    mov     al, [rdi + rcx]         ; getting current char of string to convert
+    cmp     al, 0                   ; checking null byte
     je      .exit
-    mov     r9, -1                  ; init index for find index
-    je      .exit             
-    cmp     r9, -1                  ; error check, -1 == current char not in base
-    call    .find_index
-    mov     rax, r8                 ; moving final nb to rax
-    mov     r10, [rel base_len]     ; moving base len int to r10
-    mul     r10                     ; multiplying rax (= final nb rn) by base len             
-    mov     r8, rax                 ; returning final number to r8
-    add     r8, r9                  ; adding index value to number
+    mov     rsi, [rel base]         ; arg1 for find_index (= haystack)
+    push    rdi                     ; saving rdi
+    mov     dil, al                 ; arg2 for find_index (= needle)
+    call    .find_index             
+    pop     rdi                     ; restoring rdi
+    cmp     rax, -1                 ; error check, -1 == current char not in base
+    je      .exit 
+    mov     rdx, rax                ; saving index result  
+    mov     eax, [rbp - 4]          ; moving final result to rax, (eax == rax but 0ing all other bits) needed to use MUL
+    mov     ebx, [rel base_len]     ; getting base len 
+    push    rdx                     ; MUL WILL ERASE RDI FFS
+    mul     ebx                     ; final nb * base len
+    pop     rdx
+    add     eax, edx                ; + index of current char (== its value)
+    mov     [rbp - 4], rax          ; saving (current) final result
     jmp     .convert_loop
 
 .exit:
     ret
-
-.exit_error:
-    mov     rax, -1
-
-.exit_idx_loop:
-    mov     rax, r9
-
 
 ;;;;;;;;;;;;;;;
 
