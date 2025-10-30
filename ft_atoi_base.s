@@ -119,7 +119,7 @@ convert:
     mov     rdx, rax                ; saving index result  
     mov     eax, [rbp - 4]          ; moving final result to rax, (eax == rax but 0ing all other bits) needed to use MUL
     mov     ebx, [rel base_len]     ; getting base len 
-    push    rdx                     ; MUL WILL ERASE RDI FFS
+    push    rdx                     ; MUL WILL ERASE RDX FFS
     mul     ebx                     ; final nb * base len
     pop     rdx
     add     eax, edx                ; + index of current char (== its value)
