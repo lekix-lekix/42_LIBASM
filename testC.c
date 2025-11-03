@@ -10,7 +10,7 @@ typedef struct s_list
 {
 	void			*data;
 	struct s_list	*next;
-}	t_list;
+}					t_list;
 
 int					ft_strlen(const char *str);
 int					ft_strcmp(const char *s1, const char *s2);
@@ -41,12 +41,18 @@ t_list	*new_node(void *data)
 void	print_list(t_list **lst)
 {
 	t_list	*curr;
+	int		*data;
 
 	curr = *lst;
 	while (curr)
 	{
 		// int *data = curr->data;
-		printf("data = %d\n", *((int *)curr->data));
+		if (curr->data)
+		{
+			data = curr->data;
+			printf("data = %d\n", *data);
+			// printf("data = %d\n", *((int *)curr->data));
+		}
 		curr = curr->next;
 	}
 }
@@ -67,10 +73,13 @@ int	main(int argc, char **argv)
 
 	(void)argc;
 	t_list *lst = NULL;
-	int *elem = malloc(sizeof(int));
-	*elem = 1;
+	for (int i = 0; i < 10; i++)
+	{
+		int *elem = malloc(sizeof(int));
+		*elem = i;
+		ft_list_push_front(&lst, elem);
+	}
 
-	ft_list_push_front(&lst, (void*)elem);
 	print_list(&lst);
 	// printf("%d\n", ft_strlen("cocou"));
 
