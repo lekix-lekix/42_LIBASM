@@ -1,17 +1,7 @@
-; typedef struct s_list
-; {
-; 	void			*data;
-; 	struct s_list	*next;
-; }					t_list;
-; so total size 16 bytes : 8 bytes for data & 8 bytes for next (both pointers)
-
 extern malloc
 
 section     .text
     global      ft_list_push_front
-
-; section     .bss
-    ; new_node:    resb 1         ; reserving 8 bytes for the future new node ptr
 
 ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     push    rbp                 ; setting a new stack frame
@@ -22,7 +12,6 @@ ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     cmp     rax, 0              ; checking error 
     je      .alloc_error_exit   ;
     pop     rdi                 ; restoring rdi
-    ; mov     rdi, [rdi]        ; dereferencing list double ptr to reference the first elem
     mov     rsi, rax            ; setting new node as second arg
     call    .push_node_front    
     pop     rbp                 ;
@@ -61,11 +50,3 @@ ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
 
  .alloc_error_exit:
     ret
-
-; info registers si rdi
-; rsi     0x5555555592a0  93824992252576
-; rdi     0x7fffffffddb8  140737488346552
-
-; info registers si rdi
-; rsi     0x7fffffffddb8  140737488346552
-; rdi     0x7fffffffddb8  140737488346552

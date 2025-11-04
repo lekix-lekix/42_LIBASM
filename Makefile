@@ -7,7 +7,9 @@ SRCS = ./ft_strlen.s \
 		./ft_read.s \
 		./ft_strdup.s \
 		./ft_atoi_base.s \
-		./ft_list_push_front.s
+		./ft_list_push_front.s \
+		./ft_list_size.s \
+		./ft_list_sort.s
 
 OBJS = $(SRCS:.s=.o)
 
@@ -30,5 +32,8 @@ fclean: clean
 
 re: fclean
 	make all
+
+test: all
+	gcc -Wall -Wextra -Werror test.c ./$(NAME) -g
 
 .PHONY: all clean fclean re bonus

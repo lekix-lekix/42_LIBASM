@@ -4,6 +4,7 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
 typedef struct s_list
@@ -20,22 +21,21 @@ ssize_t				ft_read(int fildes, void *buf, size_t nbytes);
 int					ft_atoi_base(char *str, char *base);
 char				*ft_strdup(const char *str);
 void				ft_list_push_front(t_list **begin_list, void *data);
+int					ft_list_size(t_list *begin);
+void				ft_list_sort(t_list **begin, int (*cmp)());
+
+typedef int (*func)(int, int);
 
 char				s1[7];
 char				s2[7];
 
-// char s3[7];
-// char s4[] = "couccc";
-
-t_list	*new_node(void *data)
+int		cmp(int a, int b)
 {
-	t_list	*node;
-
-	node = malloc(sizeof(t_list));
-	if (!node)
-		return (NULL);
-	node->data = data;
-	node->next = NULL;
+	if (a < b)
+		return (-1);
+	else if (a > b)
+		return (1);
+	return (0);
 }
 
 void	print_list(t_list **lst)
@@ -57,7 +57,7 @@ void	print_list(t_list **lst)
 	}
 }
 
-int	main(int argc, char **argv)
+int	main(void)
 {
 	// memset(s1, 0, 7);
 	// memset(s3, 0, 7);
@@ -70,17 +70,41 @@ int	main(int argc, char **argv)
 	// res = ft_write(1, "coucou", 6);
 	// printf("%d\n", res);
 	// perror("write");
-
-	(void)argc;
 	t_list *lst = NULL;
-	for (int i = 0; i < 10; i++)
-	{
-		int *elem = malloc(sizeof(int));
-		*elem = i;
-		ft_list_push_front(&lst, elem);
-	}
+	srand(time(NULL)); // Initialization, should only be called once.
+	// for (int i = 0; i < 30; i++)
+	// {
+		// int *elem = malloc(sizeof(int));
+		// int r = rand();   
+			// Returns a pseudo-random integer between 0 and RAND_MAX.
+		// *elem = r % 20;
+		// ft_list_push_front(&lst, elem);
+	// }
+
+	int *elem = malloc(sizeof(int));
+	*elem = 3;
+	ft_list_push_front(&lst, elem);
+
+	elem = malloc(sizeof(int));
+	*elem = 2;
+	ft_list_push_front(&lst, elem);
+
+	elem = malloc(sizeof(int));
+	*elem = 1;
+	ft_list_push_front(&lst, elem);
 
 	print_list(&lst);
+	// printf("size = %d\n", ft_list_size(NULL));
+	ft_list_sort(&lst, cmp);
+	print_list(&lst);
+
+	for (t_list *curr = lst; curr;)
+	{
+		t_list *prev = curr;
+		free(curr->data);
+		curr = curr->next;
+		free(prev);
+	}
 	// printf("%d\n", ft_strlen("cocou"));
 
 	// printf("%d\n", ft_strlen("coucou"));
