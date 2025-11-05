@@ -24,33 +24,50 @@ void				ft_list_push_front(t_list **begin_list, void *data);
 int					ft_list_size(t_list *begin);
 void				ft_list_sort(t_list **begin, int (*cmp)());
 
-typedef int (*func)(int, int);
+typedef int (*func)();
 
 char				s1[7];
 char				s2[7];
 
-int		cmp(int a, int b)
-{
-	if (a < b)
-		return (-1);
-	else if (a > b)
-		return (1);
-	return (0);
-}
+// int		cmp(void *a, void *b)
+// {
+// 	if (a < b)
+// 		return (-1);
+// 	else if (a > b)
+// 		return (1);
+// 	return (0);
+// }
 
-void	print_list(t_list **lst)
+void	print_list_int(t_list **lst)
 {
 	t_list	*curr;
-	int		*data;
+	// void	*data;
 
 	curr = *lst;
 	while (curr)
 	{
-		// int *data = curr->data;
 		if (curr->data)
 		{
-			data = curr->data;
+			int *data = curr->data;
 			printf("data = %d\n", *data);
+			// printf("data = %d\n", *((int *)curr->data));
+		}
+		curr = curr->next;
+	}
+}
+
+void	print_list_str(t_list **lst)
+{
+	t_list	*curr;
+	// void	*data;
+
+	curr = *lst;
+	while (curr)
+	{
+		if (curr->data)
+		{
+			// int *data = curr->data;
+			printf("data = %s\n", (char*)curr->data);
 			// printf("data = %d\n", *((int *)curr->data));
 		}
 		curr = curr->next;
@@ -59,92 +76,17 @@ void	print_list(t_list **lst)
 
 int	main(void)
 {
-	// memset(s1, 0, 7);
-	// memset(s3, 0, 7);
+	char a[] = "a";
+	char b[] = "b";
+	char c[] = "c";
 
-	// strcpy(s1, s2);
-	// ft_strcpy(s1, s2);
-	// printf("%s\n", s3);
-	// printf("%s\n", s1);
-	// int res;
-	// res = ft_write(1, "coucou", 6);
-	// printf("%d\n", res);
-	// perror("write");
 	t_list *lst = NULL;
-	srand(time(NULL)); // Initialization, should only be called once.
-	// for (int i = 0; i < 30; i++)
-	// {
-		// int *elem = malloc(sizeof(int));
-		// int r = rand();   
-			// Returns a pseudo-random integer between 0 and RAND_MAX.
-		// *elem = r % 20;
-		// ft_list_push_front(&lst, elem);
-	// }
 
-	int *elem = malloc(sizeof(int));
-	*elem = 3;
-	ft_list_push_front(&lst, elem);
+	ft_list_push_front(&lst, &a);
+	ft_list_push_front(&lst, &b);
+	ft_list_push_front(&lst, &c);
 
-	elem = malloc(sizeof(int));
-	*elem = 2;
-	ft_list_push_front(&lst, elem);
-
-	elem = malloc(sizeof(int));
-	*elem = 1;
-	ft_list_push_front(&lst, elem);
-
-	print_list(&lst);
-	// printf("size = %d\n", ft_list_size(NULL));
-	ft_list_sort(&lst, cmp);
-	print_list(&lst);
-
-	for (t_list *curr = lst; curr;)
-	{
-		t_list *prev = curr;
-		free(curr->data);
-		curr = curr->next;
-		free(prev);
-	}
-	// printf("%d\n", ft_strlen("cocou"));
-
-	// printf("%d\n", ft_strlen("coucou"));
-	// res = ft_write(-1, "coucou", 6);
-	// printf("%d\n", res);
-	// perror("write");
-
-	// // write(1, NULL, 6);
-	// // perror("write");
-
-	// res = ft_write(-1, "coucou", 6);
-	// printf("%d\n", res);
-	// perror("write");
-
-	// res = write(-1, "coucou", 0);
-	// printf("%d\n", res);
-	// perror("write");
-
-	// res = ft_write(-1, "coucou", 0);
-	// printf("%d\n", res);
-	// perror("write");
-
-	// res = ft_write(1, NULL, 6);
-	// printf("%d\n", res);
-	// perror("write");
-
-	// printf("len = %d\n", ft_strlen("coucou toi la vache"));
-	// // printf("strdup = %d\n", ft_strdup("hey"));
-	// char *str = ft_strdup("coucou toi la vache");
-	// printf("%s\n", str);
-	// free(str);
-	// char base[] = "01";
-	// int nb = ft_atoi_base(argv[1], argv[2]);
-	// printf("%d\n", nb);
-
-	// int fd = open("./testC.c", O_RDONLY);
-	// read(fd, s1, -1);
-	// perror("read");
-	// ft_read(fd, s2, -1);
-	// perror("read");
-	// printf("%s\n", s1);
-	// printf("%s\n", s2);
+	printf("%d\n", strcmp(c, b));
+	print_list_str(&lst);
+	ft_list_sort(&lst, strcmp);
 }

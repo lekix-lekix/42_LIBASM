@@ -4,9 +4,9 @@ section     .text
     global      ft_list_push_front
 
 ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
-    push    rbp                 ; setting a new stack frame
+    push    rbp                 ; setting a new stack frame (stack -= 8 == -8)
     mov     rbp, rsp            ; moving rsp to the bottom of the new stack
-    push    rdi                 ; saving rdi to call pass data as arg for .alloc_new_node
+    push    rdi                 ; saving rdi to pass data as arg for .alloc_new_node (stack -= 8 == -16)
     mov     rdi, rsi            ; setting arg
     call    .alloc_new_node     
     cmp     rax, 0              ; checking error 
@@ -18,19 +18,11 @@ ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     ret
 
 .push_node_front:
-    cmp     byte [rdi], 0       ; accessing first element of list
-    je      .add_node_begin     ; just add the new node
-    mov     rcx, [rdi]          ; setting rcx (index) as current element of list (here first)
-    jmp     .list_loop          
-
-.list_loop:
-    cmp     qword [rcx + 8], 0  ; checking curr->next
-    je      .add_node           ; null -> add new node
-    mov     rcx, [rcx + 8]      ; else -> curr = current->next
-    jmp     .list_loop
-    
-.add_node:
-    mov     qword [rcx + 8], rsi  ; curr->next = new node
+    cmp     qword [rdi], 0       ; accessing first element of list
+    je      .add_node_begin      ; just add the new node
+    mov     rcx, [rdi]           ; getting first node 
+    mov     qword [rsi + 8], rcx ; new_node -> next = first node
+    mov     [rdi], rsi           ; *begin_list = new_node
     ret
 
 .add_node_begin:
@@ -38,10 +30,12 @@ ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     ret
 
 .alloc_new_node:                ; rdi : void *data
-    push    rdi                 ; saving rdi 
+    push    rdi                 ; saving rdi (stack -= 8 == -24 !)
+    sub     rsp, 8              ; aligning stack (misaligned because of push rdi)
     mov     rdi, 16             ; size needed to hold a new node
     call    malloc wrt ..plt    ; wrt ..plt to call from an external library
     cmp     rax, 0              ; checking null
+    add     rsp, 8             
     je      .alloc_error_exit   
     pop     rdi                 ; restoring rdi 
     mov     [rax], rdi          ; node->data = data (rdi)

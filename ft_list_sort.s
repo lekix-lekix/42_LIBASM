@@ -7,9 +7,9 @@ section     .text
     global      ft_list_sort
 
 ft_list_sort:           ; void ft_list_sort(t_list **begin_list, int (*cmp)())
-    push    rbp
+    push    rbp                     ; stack == 8
     mov     rbp, rsp    
-    ; mov     rdi, [rdi]              ; dereferencing first arg to get a t_list * single ptr
+    ; mov     rdi, [rdi]            ; dereferencing first arg to get a t_list * single ptr
     mov     [rel lst_begin], rdi    ; saving it in stack to be able to get it back 
     mov     [rel cmp_func], rsi     ; saving it in stack to be able to get it back 
     call    .begin_cmp_loop
@@ -27,14 +27,16 @@ ft_list_sort:           ; void ft_list_sort(t_list **begin_list, int (*cmp)())
     cmp     rcx, 0                  ; checking null element
     je      .ret
     mov     rdi, rcx                ; loading current->data
-    ; mov     rdi, rdi]              ; dereferencing to get the actual data and not the ptr
-    mov     rsi, [rcx + 8]            ; loading element->next
-    ; mov     rsi, [rsi]              ; dereferencing to get the actual data and not the ptr
-    push    rdi                     ; saving just in case
-    push    rsi
-    mov     rdi, [rdi]
+    ; mov     rdi, rdi]             ; dereferencing to get the actual data and not the ptr
+    mov     rsi, [rcx + 8]          ; loading element->next
+    ; mov     rsi, [rsi]            ; dereferencing to get the actual data and not the ptr
+    push    rdi                     ; saving just in case (stack = 16)
+    push    rsi                     ; stack = 24
+    push    rcx                     ; stack = 32
+    mov     rdi, [rdi]              
     mov     rsi, [rsi]
     call    [rel cmp_func]          ; calling cmp_func on curr->data and next->data
+    pop     rcx
     pop     rsi
     pop     rdi
     cmp     rax, 1                  ; if curr->data > next->data : swap needed
@@ -43,7 +45,7 @@ ft_list_sort:           ; void ft_list_sort(t_list **begin_list, int (*cmp)())
     mov     rcx, [rcx + 8]          ; curr = curr->next
     jmp     .cmp_loop
 
-.swap_elems:        ; rdi : current, rsi: current->next
+.swap_elems:            ; rdi : current, rsi: current->next
     mov     rbx, [rel prev]         ; loading prev element
     cmp     rbx, 0                  ; is there a prev ?
     jmp     .set_first_elem         ; no -> we're at list begin and need to set next as first element
@@ -54,10 +56,10 @@ ft_list_sort:           ; void ft_list_sort(t_list **begin_list, int (*cmp)())
     jmp     .begin_cmp_loop         ; starting over
 
 .set_first_elem:        ; rdi : current, rsi: current->next
-    mov     rbx, [rel lst_begin]    ; loading **begin_list
     mov     rcx, [rsi + 8]          ; saving previous next->next
     mov     [rsi + 8], rdi          ; setting current as next->next
     mov     [rdi + 8], rcx          ; tying the rest of the list to the new last node (AKA current)
+    mov     rbx, [rel lst_begin]    ; loading **begin_list
     mov     [rbx], rsi              ; moving next as first elem of list
     jmp     .begin_cmp_loop         ; starting over
 
