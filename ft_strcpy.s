@@ -16,5 +16,6 @@ ft_strcpy:
 
 .quit:
     mov     [rdi + rcx], byte 0x00          ; adding a \0 to the end of dest
+    mov     rax, rdi                        ; returning ptr to dest 
     pop     rbp                             ; restoring rbp
     ret

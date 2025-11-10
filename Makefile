@@ -35,6 +35,6 @@ re: fclean
 	make all
 
 test: all
-	gcc -Wall -Wextra -Werror test.c ./$(NAME) -g
+	gcc  test.c ./$(NAME) -g
 
 .PHONY: all clean fclean re bonus

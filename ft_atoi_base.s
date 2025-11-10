@@ -8,7 +8,7 @@ section     .bss
 section     .text
     global      ft_atoi_base
 
-ft_atoi_base:
+ft_atoi_base:   ; int ft_atoi_base(char *str, char *base)
     push    rbp                          ; saving rbp
     mov     rbp, rsp                     ; setting up a new stack frame
     mov     [rel str], rdi               ; saving rdi (string to convert)
@@ -51,13 +51,13 @@ convert:
     sub     rsp, 16                 ; declaring 2 local var (neg & final nb)
     mov     DWORD [rbp - 8], 0      ; negative nb flag on the stack (DWORD == int)
     mov     DWORD [rbp - 4], 0      ; init final nb on the stack 
-    mov     rsi, [rel str]          ; moving address of string to convert 
-    call    .check_sign
-    mov     sil, [rsi]
-    mov     rdi, [rel str]         ; loading base as 2nd arg of convert loop
+    mov     rdi, [rel str]          ; moving address of string to convert 
     mov     rcx, -1
+    call    .check_sign
     mov     rsi, [rel base]
     call    .convert_loop   
+    cmp     DWORD [rbp - 8], 1
+    je      .neg_exit
     mov     rax, [rbp - 4]          ; moving final nb to rax (return convention)
     add     rsp, 8
     mov     rsp, rbp
@@ -73,7 +73,7 @@ convert:
     ret
 
 .set_neg:
-    mov     byte [rbp - 8], 1
+    mov     DWORD [rbp - 8], 1
     jmp     .inc_rcx
 
 .inc_rcx:
@@ -127,6 +127,14 @@ convert:
     jmp     .convert_loop
 
 .exit:
+    ret
+
+.neg_exit:
+    mov     eax, [rbp - 4]          ; moving final nb to rax (return convention)
+    neg     eax
+    add     rsp, 8
+    mov     rsp, rbp
+    pop     rbp
     ret
 
 ;;;;;;;;;;;;;;;

@@ -55,16 +55,19 @@ ft_list_remove_if:      ; void ft_list_remove_if(t_list **begin_list, void *data
     je      .update_lst_begin               ; yes -> elem to remove is begin of list and thus the begin needs to be updated with to_remove->next
     cmp     qword [rcx + 8], 0              ; checking to_remove->next
     je      .update_lst_end                 ; yes -> prev needs to be updated to end of lst (NULL)
-    ; mov     rdi, rcx                        ; to_remove as first arg
-    ; call    .free_node
+    mov     rdi, [rbp - 16]                 ; getting previous node
+    mov     rsi, [rcx + 8]                  ; getting current->next
+    mov     [rdi + 8], rsi                  ; linking previous->next to current->next
+    jmp     .free_node
     ; jmp     .begin_cmp_loop
 
 .free_node:
     push    rcx                             ; saving rcx (node)
-    mov     rcx, [rcx]                      ; getting access to node->data
+    mov     rdi, [rcx]                      ; node->data as first arg
     call    [rbp - 24]                      ; free node->data
-    pop     rcx
-    call    [rbp - 24]                      ; free node
+    pop     rcx                             ; restoring node
+    mov     rdi, rcx                        ; node as first arg
+    call    [rbp - 24]                      ; free node 
     jmp     .begin_cmp_loop
 
 .update_lst_begin:

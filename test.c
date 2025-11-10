@@ -15,7 +15,7 @@ typedef struct s_list
 
 int					ft_strlen(const char *str);
 int					ft_strcmp(const char *s1, const char *s2);
-int					ft_strcpy(char *dest, const char *src);
+char				*ft_strcpy(char *dest, const char *src);
 ssize_t				ft_write(int fildes, const void *buf, size_t count);
 ssize_t				ft_read(int fildes, void *buf, size_t nbytes);
 int					ft_atoi_base(char *str, char *base);
@@ -68,12 +68,14 @@ void	print_list_int(t_list **lst)
 	curr = *lst;
 	while (curr)
 	{
-		if (curr->data)
-		{
-			data = curr->data;
-			printf("data = %d\n", *data);
-			// printf("data = %d\n", *((int *)curr->data));
-		}
+		// if (curr->data)
+		// {
+		// 	data = curr->data;
+		// 	printf("data = %d\n", data);
+		// 	// printf("data = %d\n", *((int *)curr->data));
+		// }
+		
+		printf("data = %d\n", *((int *)curr->data));
 		curr = curr->next;
 	}
 }
@@ -96,49 +98,30 @@ void	print_list_str(t_list **lst)
 	}
 }
 
+int	lower(void *d1, void *d2)
+{
+	return ((long long)d1 > (long long)d2);
+}
+
 int	main(void)
 {
-	char *a = malloc(5);
-	char *b = malloc(5);
-	char *c = malloc(5);
+	t_list *list = NULL;
 
-	bzero(a, 5);
-	bzero(b, 5);
-	bzero(c, 5);
-
-	// strcpy(a, "a");
-	// strcpy(b, "b");
-	// strcpy(c, "c");
-
-	t_list *lst = NULL;
-	// t_list *lst2 = NULL;
-
-	ft_list_push_front(&lst, &a);
-	ft_list_push_front(&lst, &b);
-	ft_list_push_front(&lst, &c);
-
-	// print_list_str(&lst);
-	// printf("===========\n");
-	// ft_list_sort(&lst, strcmp);
-	// print_list_str(&lst);
-
-	// int *int1 = malloc(sizeof(int));
-	// *int1 = 0;
-	// int *int2 = malloc(sizeof(int));
-	// *int2 = 1;
-	// int *int3 = malloc(sizeof(int));
-	// *int3 = 2;
-
-	// ft_list_push_front(&lst, int1);
-	// ft_list_push_front(&lst, int2);
-	// ft_list_push_front(&lst, int3);
-
-	print_list_str(&lst);
-	printf("===========\n");
-
-	char data_ref[] = "c";
-
-	ft_list_remove_if(&lst, &data_ref, strcmp, free);
-	print_list_str(&lst);
-
+	// ft_list_push_front(&lst, (void *)1);
+	for (int i = 0; i < 10; i++)
+	{
+		int *nb = malloc(sizeof(int));
+		*nb = i;
+		ft_list_push_front(&list, nb);
+	}
+	print_list_int(&list);
+	printf("============\n");
+	ft_list_sort(&list, lower);
+	print_list_int(&list);
+	for (int i = 0; i < 10; i++)
+	{
+		ft_list_remove_if(&list, &i, lower, free);
+	}
+	print_list_int(&list);
+	// ft_list_remove_if(&list, (void *)0, )
 }

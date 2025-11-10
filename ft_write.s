@@ -1,7 +1,7 @@
 section     .text
     global      ft_write
 
-extern      __errno_location        ; including errno_location func that returns errno's addr
+extern      __errno_location            ; including errno_location func that returns errno's addr
 
 ft_write:
     push    rbp                         ; saving rbp, since we make a syscall here it is mandatory to restore it to align the stack

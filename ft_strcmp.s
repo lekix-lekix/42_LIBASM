@@ -7,20 +7,18 @@ ft_strcmp:
     mov     rcx, -1                          ; initializing an index to -1
 
 .loop:              
-    add     rcx, 1                           ; incrementing index
-    movzx   rax, byte [rdi + rcx]            ; moving current char of first arg to rax and zeroing the rest of the register
-    movzx   rdx, byte [rsi + rcx]            ; moving current char of second arg to rax and zeroing the rest of the register
-    cmp     byte [rax + rcx], 0x00           ; checking if null byte at arg + index
-    je      .return_diff                     ; jumping if null byte found
-    cmp     rax, rdx                         ; comparing the two args at arg + index
-    jne     .return_diff                     ; jumping if a difference is found 
-    je      .loop
+    inc     rcx                              ; incrementing index
+    mov     al, [rdi + rcx]                  ; moving s1 + i to al (rax low register)
+    mov     dl, [rsi + rcx]                  ; moving s2 + i to al (rdx low register)
+    cmp     al, 0                            ; s1 + i == NULL ?
+    je      .return_diff                     
+    cmp     al, dl                           ; s1 + i != s2 + i ? 
+    jne     .return_diff
+    jmp     .loop
 
 .return_diff:
-    sub     rax, rdx                        ; returning the difference between the two strings 
-    pop     rbp                             ; restoring rbp
+    movzx   eax, al                          ; moving char to eax, we're going to sub dl from al, but we need to put it to a signed register to get a neg nb
+    movzx   edx, dl                          ; movzx to zero the rest of the register 
+    sub     eax, edx                         ; returning the difference between the two strings 
+    pop     rbp                              ; restoring rbp
     ret
-
-
-; if rax / rdx is not zeroed, returning or subbing make strange things happen
-; because only a char is is stored in a 8 byte register

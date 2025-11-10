@@ -6,6 +6,10 @@ section     .text
 ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     push    rbp                 ; setting a new stack frame (stack -= 8 == -8)
     mov     rbp, rsp            ; moving rsp to the bottom of the new stack
+    cmp     rdi, 0 
+    je      .error_exit
+    ; cmp     rsi, 0
+    ; je      .error_exit
     push    rdi                 ; saving rdi to pass data as arg for .alloc_new_node (stack -= 8 == -16)
     mov     rdi, rsi            ; setting arg
     call    .alloc_new_node     
@@ -42,5 +46,9 @@ ft_list_push_front:             ; rdi : t_list **begin_list, rsi : void *data
     mov     qword [rax + 8], 0  ; node->next = NULL
     ret
 
- .alloc_error_exit:
+.alloc_error_exit:
+    ret
+
+.error_exit:
+    pop     rbp
     ret

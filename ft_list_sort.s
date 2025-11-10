@@ -13,6 +13,8 @@ ft_list_sort:           ; void ft_list_sort(t_list **begin_list, int (*cmp)())
     je      .error_exit
     cmp     rsi, 0
     je      .error_exit
+    cmp     DWORD [rdi], 0
+    je      .error_exit
     mov     [rel lst_begin], rdi    ; saving it in stack to be able to get it back 
     mov     [rel cmp_func], rsi     ; saving it in stack to be able to get it back 
     call    .begin_cmp_loop
