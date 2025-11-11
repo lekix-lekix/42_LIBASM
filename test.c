@@ -1,127 +1,137 @@
-#include <fcntl.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   test.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kipouliq <kipouliq@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 12:45:04 by kipouliq          #+#    #+#             */
+/*   Updated: 2025/11/11 16:40:46 by kipouliq         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "./libasm.h"
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <strings.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <stdlib.h>
 
-typedef struct s_list
-{
-	void			*data;
-	struct s_list	*next;
-}					t_list;
+int main ()
+{	
+	
+	/**** FT_STRLEN ***/
+	
+	printf("/**** FT_STRLEN ****/\n\n");
+	char str[] = "coucou";
+	printf("strlen: %ld, ft_strlen: %ld\n", strlen(str), ft_strlen(str));
+	printf("strlen: %ld, ft_strlen: %ld\n", strlen(""), ft_strlen(""));
+	printf("/******************/\n\n");
+	
+	/**** FT_STRCPY ***/
 
-int					ft_strlen(const char *str);
-int					ft_strcmp(const char *s1, const char *s2);
-char				*ft_strcpy(char *dest, const char *src);
-ssize_t				ft_write(int fildes, const void *buf, size_t count);
-ssize_t				ft_read(int fildes, void *buf, size_t nbytes);
-int					ft_atoi_base(char *str, char *base);
-char				*ft_strdup(const char *str);
-void				ft_list_push_front(t_list **begin_list, void *data);
-int					ft_list_size(t_list *begin);
-void				ft_list_sort(t_list **begin, int (*cmp)());
-void				ft_list_remove_if(t_list **begin_list, void *data_ref,
-						int (*cmp)(), void (*free_fct)(void *));
+	printf("/**** FT_STRCPY ****/\n\n");
+	char s1[20] = "coucou toi";
+	char s2[20];
+	printf("s1 = %p, s2 = %p\n", s1, s2);
+	printf("strcpy ret : %p\n", strcpy(s2, s1));
+	printf("s2 content : %s\n", s2);
+	bzero(s2, 20);
+	printf("ft_strcpy ret : %p\n", ft_strcpy(s2, s1));
+	printf("s2 content : %s\n", s2);
+	printf("%s\n", s2);
 
-typedef int			(*func)();
-typedef void		(*free_func)(void *);
+	bzero(s2, 20);
+	printf("strcpy ret : %p\n", strcpy(s2, ""));
+	printf("s2 content : %s\n", s2);
+	bzero(s2, 20);
+	printf("ft_strcpy ret : %p\n", ft_strcpy(s2, ""));
+	printf("s2 content : %s\n", s2);
+	printf("/******************/\n\n");
 
-char				s1[7];
-char				s2[7];
+	/**** FT_STRCMP ***/
+	
+	printf("/**** FT_STRCMP ****/\n\n");
+	printf("strcmp ret : %d\n", strcmp("a", "b"));
+	printf("ft_strcmp ret : %d\n", ft_strcmp("a", "b"));
+	printf("strcmp ret : %d\n", strcmp("b", "a"));
+	printf("ft_strcmp ret : %d\n", ft_strcmp("b", "a"));
+	printf("strcmp ret : %d\n", strcmp("b", "b"));
+	printf("ft_strcmp ret : %d\n", ft_strcmp("b", "b"));
+	printf("strcmp ret : %d\n", strcmp("aaaab", "aaaac"));
+	printf("ft_strcmp ret : %d\n", ft_strcmp("aaaab", "aaaac"));
+	printf("strcmp ret : %d\n", strcmp("", ""));
+	printf("ft_strcmp ret : %d\n", ft_strcmp("", ""));
+	printf("/******************/\n\n");
 
-// int		cmp(void *a, void *b)
-// {
-// 	if (*(int *)a < *(int *)b)
-// 		return (-1);
-// 	else if (*(int *)a > *(int *)b)
-// 		return (1);
-// 	return (0);
-// }
+	/**** FT_WRITE ***/
+	int fd = open("./test", O_RDWR | O_CREAT, 0644);
+	
+	printf("/**** FT_WRITE ****/\n\n");
+	printf("write = %ld\n", write(1, "coucou\n", 7));
+	printf("ft_write = %ld\n", ft_write(1, "coucou\n", 7));
+	printf("write = %ld\n", write(2, "error\n", 6));
+	printf("ft_write = %ld\n", ft_write(2, "error\n", 6));
+	printf("write = %ld\n", write(fd, "hello\n", 6));
+	printf("ft_write = %ld\n", ft_write(fd, "hello\n", 6));
+	printf("write = %ld\n", write(10, "hello\n", 6));
+	perror("write");
+	errno = 0;
+	perror("errno reset");
+	printf("ft_write = %ld\n", ft_write(10, "hello\n", 6));
+	perror("write");
+	printf("/******************/\n\n");
+	
+	/**** FT_READ ***/
+	printf("/**** FT_READ ****/\n\n");
+	char buffer[21] = {0};
+	
+	fd = open("./Makefile", O_RDONLY);
+	printf("read = %ld\n", read(fd, buffer, 20));
+	printf("buffer = %s\nlen = %ld\n", buffer, strlen(buffer));
+	close(fd);
+	
+	fd = open("./Makefile", O_RDONLY);
+	bzero(buffer, 21);
+	printf("ft_read = %ld\n", ft_read(fd, buffer, 20));
+	printf("buffer = %s\nlen = %ld\n", buffer, strlen(buffer));
+	close(fd);
+	
+	printf("read = %ld\n", read(10, buffer, 20));
+	printf("buffer = %s\nlen = %ld\n", buffer, strlen(buffer));
+	perror("read");
+	printf("\n");
 
-int	cmp(int a, int b)
-{
-	if (a < b)
-		return (-1);
-	else if (a > b)
-		return (1);
-	return (0);
-}
+	errno = 0;
 
-int	int_cmp(void *a, void *b)
-{
-	if (*(int *)a < *(int *)b)
-		return (-1);
-	else if (*(int *)a > *(int *)b)
-		return (1);
-	return (0);
-}
+	printf("ft_read = %ld\n", read(10, buffer, 20));
+	printf("buffer = %s\nlen = %ld\n", buffer, strlen(buffer));
+	perror("ft_read");
+	printf("\n");	
+	printf("/******************/\n\n");
 
-void	print_list_int(t_list **lst)
-{
-	t_list	*curr;
-	int		*data;
+	/**** FT_STRDUP ***/
+	printf("/**** FT_READ ****/\n\n");
+	char *str_ptr = strdup("coucou\n");
+	printf("strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr));
+	free(str_ptr);
 
-	// void	*data;
-	curr = *lst;
-	while (curr)
-	{
-		// if (curr->data)
-		// {
-		// 	data = curr->data;
-		// 	printf("data = %d\n", data);
-		// 	// printf("data = %d\n", *((int *)curr->data));
-		// }
-		
-		printf("data = %d\n", *((int *)curr->data));
-		curr = curr->next;
-	}
-}
+	str_ptr = ft_strdup("coucou\n");
+	printf("ft_strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr));
+	free(str_ptr);
 
-void	print_list_str(t_list **lst)
-{
-	t_list	*curr;
+	str_ptr = strdup("");
+	printf("strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr));
+	free(str_ptr);
 
-	// void	*data;
-	curr = *lst;
-	while (curr)
-	{
-		if (curr->data)
-		{
-			// int *data = curr->data;
-			printf("data = %s\n", (char *)curr->data);
-			// printf("data = %d\n", *((int *)curr->data));
-		}
-		curr = curr->next;
-	}
-}
+	str_ptr = ft_strdup("");
+	printf("ft_strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr));
+	free(str_ptr);
 
-int	lower(void *d1, void *d2)
-{
-	return ((long long)d1 > (long long)d2);
-}
+	// str_ptr = strdup(NULL);
+	// printf("strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr)); // WILL CRASH
 
-int	main(void)
-{
-	t_list *list = NULL;
-
-	// ft_list_push_front(&lst, (void *)1);
-	for (int i = 0; i < 10; i++)
-	{
-		int *nb = malloc(sizeof(int));
-		*nb = i;
-		ft_list_push_front(&list, nb);
-	}
-	print_list_int(&list);
-	printf("============\n");
-	ft_list_sort(&list, lower);
-	print_list_int(&list);
-	for (int i = 0; i < 10; i++)
-	{
-		ft_list_remove_if(&list, &i, lower, free);
-	}
-	print_list_int(&list);
-	// ft_list_remove_if(&list, (void *)0, )
+	// str_ptr = ft_strdup(NULL);
+	// printf("ft_strdup res = %s\nlen = %ld\n", str_ptr, strlen(str_ptr)); // WILL CRASH
 }
