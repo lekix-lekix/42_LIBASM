@@ -7,11 +7,11 @@ SRCS = ./ft_strlen.s \
 		./ft_read.s \
 		./ft_strdup.s
 
-SRCS_BONUS = ./ft_atoi_base.s \
-				./ft_list_push_front.s \
-				./ft_list_size.s \
-				./ft_list_sort.s \
-				./ft_list_remove_if.s
+SRCS_BONUS = ./ft_atoi_base_bonus.s \
+				./ft_list_push_front_bonus.s \
+				./ft_list_size_bonus.s \
+				./ft_list_sort_bonus.s \
+				./ft_list_remove_if_bonus.s
 
 OBJS_DIR = .objs/
 
@@ -43,17 +43,19 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f ./test
 
 re: fclean
 	make all
 
 test: all
-	gcc -Wall -Wextra -Werror test.c ./$(NAME) -g
+	gcc -Wall -Wextra -Werror main.c ./$(NAME) -g
 
 testnoflags:
 	gcc test.c ./$(NAME) -g
 
-test_bonus: bonus
-	gcc -Wall -Wextra -Werror test_bonus.c ./$(NAME) -g
+test_bonus: all 
+	make bonus
+	gcc -Wall -Wextra -Werror main_bonus.c ./$(NAME) -g
 
 .PHONY: all clean fclean re bonus test test_bonus

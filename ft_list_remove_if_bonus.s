@@ -5,12 +5,13 @@ ft_list_remove_if:      ; void ft_list_remove_if(t_list **begin_list, void *data
     push    rbp
     mov     rbp, rsp
     cmp     rdi, 0
-    je      .error_exit                     ; checking every argument to check if null
+    je      .arg_error_exit                 ; checking every argument to check if null
     cmp     rsi, 0
-    je      .error_exit
+    je      .arg_error_exit
     cmp     rdx, 0
-    je      .error_exit
+    je      .arg_error_exit
     cmp     rcx, 0
+    je      .arg_error_exit
     sub     rsp, 48
     
     mov     [rbp - 40], rdx                 ; saving cmp_func
@@ -29,6 +30,11 @@ ft_list_remove_if:      ; void ft_list_remove_if(t_list **begin_list, void *data
     pop     rbp
     ret
 
+.arg_error_exit:
+    pop     rbp
+    mov     rax, -1
+    ret
+
 .begin_cmp_loop:
     mov     qword [rbp - 16], 0             ; init prev to null
     mov     rcx, [rbp - 8]                  ; init rcx to begin_list
@@ -41,7 +47,6 @@ ft_list_remove_if:      ; void ft_list_remove_if(t_list **begin_list, void *data
     mov     rsi, [rbp - 32]                 ; data_ref as second arg
     push    rcx                             ; saving current node 
     mov     rdi, [rdi]
-    ; mov     rsi, [rsi]
     call    [rbp - 40]                      ; calling cmp func
     pop     rcx                             ; restoring current node
     cmp     rax, 0                          ; cmp func == 0 ?
@@ -59,7 +64,6 @@ ft_list_remove_if:      ; void ft_list_remove_if(t_list **begin_list, void *data
     mov     rsi, [rcx + 8]                  ; getting current->next
     mov     [rdi + 8], rsi                  ; linking previous->next to current->next
     jmp     .free_node
-    ; jmp     .begin_cmp_loop
 
 .free_node:
     push    rcx                             ; saving rcx (node)
